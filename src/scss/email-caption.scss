@@ -1,0 +1,132 @@
+.email-caption{
+    header{
+        padding: 0 21px;
+        padding-top: 50px;
+        h1{
+            margin: 15px;
+            font-size: 60px;
+        }
+    }
+    .content{
+        form{
+            label, input, div{
+                width: 100%;
+            }
+            input{
+                // -webkit-appearance: none;
+                // -moz-appearance: none;
+                // appearance: none;
+            }
+            input::-webkit-input-placeholder{
+                color: $champagne;
+            }
+            input[type=email]{
+                background: transparent;
+                border: 1px solid $grape;
+                box-sizing: border-box;
+                border-radius: 4px;
+                font-size: 20px;
+                line-height: 140%;
+                height: 74px;
+                margin-top: 15px;
+            }
+            #email-button{
+                &:enabled{
+                    opacity: 1;
+                }
+                &:disabled{
+                    opacity: 0.5;
+                }
+            }
+            .checkbox-container{
+                font-size: 13px;
+                line-height: 21px;
+                color: white;
+                padding-left: 38px;
+                display: block;
+                text-align: left;
+                margin: 30px 0;
+
+                input{
+                    opacity: 0;
+                }
+                .checkmark{
+                    pointer-events: none;
+                    &::after{
+                        content: " ";
+                        position: absolute;
+                        left: 10px;
+                        top: 7px;
+                        width: 5px;
+                        height: 10px;
+                        border: solid white;
+                        border-width: 0 3px 3px 0;
+                        -webkit-transform: rotate(45deg);
+                        -ms-transform: rotate(45deg);
+                        transform: rotate(45deg);
+                    }
+                }
+                input, .checkmark{
+                    background: transparent;
+                    border: 1px solid $grape;
+                    box-sizing: border-box;
+                    border-radius: 4px;
+                    transform: translateY(-50%);
+                    position: absolute;
+                    margin: 0;
+                    left: 0;
+                    top: 50%;
+                    width: 30px;
+                    height: 30px;
+                }
+                .checkmark::after{
+                    display: none;
+                }
+                input:focus ~ .checkmark {
+                    outline-offset: 0px;
+                    outline: -webkit-focus-ring-color auto 1px;
+                }
+                input:checked ~ .checkmark {
+                    background: $grape;
+                }
+                input:checked ~ .checkmark::after {
+                    display: block;
+                }
+
+            }
+        }
+    }
+    .terms-conditions{
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        min-height: 100%;
+        background: black;
+        z-index: 5;
+        display: none;
+        opacity: 0;
+        &.show{
+            display: block;
+            opacity: 1;
+        }
+        // padding-top: 70px;
+        h3{
+            margin: 80px 0 30px 0;
+        }
+        p{
+            text-align: left;
+            padding: 0 26px;
+        }
+        button{
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 55px;
+            height: 55px;
+            border-radius: 50px;
+            padding: 0;
+        }
+    }
+
+}

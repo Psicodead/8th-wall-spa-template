@@ -1,0 +1,40 @@
+$blueberry: #371447;
+$plump: #5F285E;
+$grape: #8a3575;
+$grapefruit: #cb3974;
+$seafoam: #1c988a;
+$champagne: #fff7f0;
+
+*{
+    position: relative;
+    box-sizing: border-box;
+}
+html, body{
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    // background-color: $grape;
+    background: black; // TEMPORAL
+}
+
+.frame-swipe, #player{
+    pointer-events: none;
+}
+.animation-wrapper{
+
+    &.mobile{
+
+    }
+
+    &.tablet{
+
+    }
+    &.landScape{
+
+    }
+    &.portrait{
+
+    }
+}

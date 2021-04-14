@@ -1,0 +1,25 @@
+.scan{
+    .footer-bill{
+        position: absolute;
+        transform: translate(-50%, -50%);
+        width: 33%;
+        left: 50%;
+        margin-top: calc(100% * -0.1);
+    }
+    .content{
+        margin-top: -50px;
+        .scan-area{
+            top: 25%;
+            border: 2px dashed #FFFFFF;
+            width: 100%;
+            height: 0;
+            padding-bottom: 50%;
+        }
+    }
+    footer{
+        h2{
+            margin: 0;
+            margin-top: 20px;
+        }
+    }
+}

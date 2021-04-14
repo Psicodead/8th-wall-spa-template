@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>8th Wall Web: Flyer</title>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/three.js/106/three.min.js"></script>
+  <!-- Required to load glTF (.gltf or .glb) models -->
+  <script src="//cdn.rawgit.com/mrdoob/three.js/r106/examples/js/loaders/GLTFLoader.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.1/howler.core.min.js"
+    integrity="sha512-wzeZyTAYqFv+VKD/mGwXREXBIzy4pE3E617SBskkLFuYcPQgX6px2Il3gwZwXb9DuyjYPIsbTEO/6c3+mUvoPA=="
+    crossorigin="anonymous"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/tween.js/16.3.5/Tween.min.js"></script>
+  <script src="//cdn.8thwall.com/web/xrextras/xrextras.js"></script>
+  <script async
+    src="//apps.8thwall.com/xrweb?appKey=jw3DmdHGlEDDfd2vFcnE7ZTrxZXWCtWDey38FplYFFRif8J4Bv36AUq2NeyoDQkkaSML2I"></script>
+  <!-- <script src="/xr-scripts/registerComponents.js"></script> -->
+
+  <!-- Video alpha shaders -->
+  <script id="vertexShader" type="x-shader/x-vertex">
+    varying vec2 vUv;
+    void main()
+    {
+        vUv = uv;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+    }
+  </script>
+  <script id="fragmentShader" type="x-shader/x-fragment">
+    #ifdef GL_ES
+    precision highp float;
+    #endif
+
+    uniform float time;
+    uniform sampler2D texture;
+    varying vec2 vUv;
+
+    void main( void ) {
+      gl_FragColor = vec4(
+        texture2D(texture, vec2(vUv.x, 0.5 + vUv.y/2.)).rgb,
+        texture2D(texture, vec2(vUv.x, vUv.y/2.)).r
+      );
+    }
+  </script>
+</head>
+
+<body>
+  <canvas id="camerafeed"></canvas>
+  <main id="main-ui">
+    <!-- TODO: move sections to individual html files and inject them on runtime with code -->
+    <section class="landing hidden" aria-label="Landing page">
+      <header>
+        <h2>ally could make your money do <span>more for you.</span></h2>
+      </header>
+      <figure>
+        <img src="/assets/images/landing-image.svg" alt="">
+      </figure>
+      <div class="content">
+        <p class="large">Scan any bill and play to win instantly</p>
+      </div>
+      <footer>
+        <img class="footer-top" src="/assets/images/footer-top.svg" alt="">
+        <button id="start-btn" type="button">let's get started</button>
+      </footer>
+    </section>
+    <section class="hidden loading-screen">
+      <header></header>
+      <div class="content"></div>
+      <footer>
+        <img class="footer-top" src="/assets/images/footer-top.svg" alt="">
+      </footer>
+    </section>
+    <section class="hidden scan">
+      <header></header>
+      <div class="content">
+        <!-- This area could be the first frame of the money animation layer, so it would always match -->
+        <div class="scan-area"></div>
+      </div>
+      <footer>
+        <img class="footer-top" src="/assets/images/footer-top.svg" alt="">
+        <figure class="footer-bill"><img src="/assets/images/bill.svg" alt=""></figure>
+        <h2>line up a <span>bill.</span></h2>
+      </footer>
+    </section>
+    <section class="hidden email-caption">
+      <header>
+        <h1>hi<span>!</span></h1>
+        <h4>have you made more of your money today by winning an instant prize? <span>Find out now!</span></h4>
+      </header>
+      <div class="content">
+        <form id="email-form" onsubmit="return false">
+          <label class="instruction" for="email">please enter your email</label>
+          <input type="email" placeholder="your email address" required>
+          <label class="checkbox-container" for="rules-checkbox">
+            I am over 18 years old +, a legal US resident and I have read and agree to the Official Rules.
+            <input id='rules-checkbox' type="checkbox" required>
+            <span class="checkmark"></span>
+          </label>
+          <div id="g-captcha"></div>
+          <button id="email-button" type="submit" disabled="disabled">submit</button>
+        </form>
+      </div>
+      <footer>
+        <img class="footer-top" src="/assets/images/footer-top.svg" alt="">
+        <button id="open-tc" class="no-fill" type="button">terms and conditions</button>
+      </footer>
+      <div class="terms-conditions">
+        <h3>terms and conditions</h3>
+        <p class="small">Lorem ipsum dolor sit amet consectetur adipisicing elit. Reiciendis consequuntur, vel quaerat quis dolore dolorem molestias provident culpa voluptates, eveniet, dolor doloribus eaque. Provident tenetur eos rerum veniam odit quasi?</p>
+        <button id="close-tc" class="close" type="button"><img src="/assets/images/x.svg" alt=""></button>
+      </div>
+    </section>
+    <section class="hidden win-screen">
+      <header>
+        <h3>you’ve made more of your money with Ally. <span>You are an instant prize winner!</span></h3>
+      </header>
+      <div class="content">
+        <p class="small">Check your email to claim your prize.</p>
+        <div class="button-tabs" role="tablist" aria-label="reedeam options">
+          <button class="unselected" id="claim-prize-tab" role="tab" aria-selected="false" aria-controls="claim-prize-panel" tabindex="0">claim prize</button>
+          <button class="unselected" id="donate-prize-tab" role="tab" aria-selected="false" aria-controls="donate-prize-panel" tabindex="0">donate</button>
+          <!-- https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles/Tab_Role -->
+        </div>
+      </div>
+      <footer>
+        <img class="footer-top" src="/assets/images/footer-top.svg" alt="">
+        <div class="panel" id="claim-prize-panel" role="tabpanel" tabindex="0" aria-labelledby="claim-prize-tab" hidden>
+          <label class="instruction">you'll be winning</label>
+          <p class="xlarge">$50.00 voucher to Spotify Premium</p>
+          <form hidden>
+            <!-- FOR PHYSICAL PRIZES ONLY -->
+          </form>
+          <button id="confirm-claim" type="button">claim prize</button>
+        </div>
+        <div class="panel" id="donate-prize-panel" role="tabpanel" tabindex="0" aria-labelledby="donate-prize-tab" hidden>
+          <label class="instruction">you'll be donating</label>
+          <p class="xlarge">$50.00 to Habitat for humanity</p>
+          <button id="confirm-donate" type="button">donate</button>
+        </div>
+      </footer>
+    </section>
+    <section class="hidden lose-screen">
+      <header>
+        <h3>you haven’t won the instant prize <span>today</span></h3>
+        <p class="small">but come back tomorrow for another chance to make more of your money.</p>
+      </header>
+      <div class="content"></div>
+      <footer>
+        <img class="footer-top" src="/assets/images/footer-top.svg" alt="">
+        <p class="small">And here’s a big reason to celebrate! </p>
+        <h2>you’ve been entered to win grand prize of <span>$20k</span></h2>
+        <button id="continue" type="button">find out more</button>
+      </footer>
+    </section>
+    <section class="hidden already-try">
+      <header></header>
+      <div class="content"></div>
+      <footer>
+        <img class="footer-top" src="/assets/images/footer-top.svg" alt="">
+      </footer>
+    </section>
+    <section class="hidden outro">
+      <header></header>
+      <div class="content"></div>
+      <footer>
+        <img class="footer-top" src="/assets/images/footer-top.svg" alt="">
+      </footer>
+    </section>
+    <img id="ally-logo" src="/assets/images/ally.svg" alt="">
+  </main>
+
+  <div class="frame-swipe">
+    <!--maybe not needed-->
+  </div>
+  <video id="player" crossorigin="anonymous" muted playsinline>
+    <source src="/videos/ar_spiral_01.mp4" />
+  </video>
+
+  <div id="animation-container"></div>
+  <!-- https://css-tricks.com/overlaying-video-with-transparency-while-wrangling-cross-browser-support/ -->
+  <!-- <div id="mainUI"></div> -->
+</body>
+
+</html>
